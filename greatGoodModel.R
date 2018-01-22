@@ -1,4 +1,3 @@
-
 #packages
 library(tidyverse)
 library(dplyr)
@@ -13,9 +12,10 @@ load("daylio.Rda")
 
 #describe data
 ggplot(data=daylio,aes(mood))+
-  geom_bar(aes(y=(..count..)/sum(..count..)),fill="chartreuse4")+
+  geom_bar(aes(y=(..count..)/sum(..count..)),fill=rgb(0,0.69,0.314))+
   labs(title="Distribution of mood",
        x="Mood",y="Proportion of total days")
+ggsave("moods.png")
 #i generally have okay days
 ggplot(data=daylio,aes(weekday,fill=mood))+
   geom_bar(aes(y=(..count..)/sum(..count..)),
@@ -25,9 +25,9 @@ ggplot(data=daylio,aes(weekday,fill=mood))+
   labs(title="Distribution of mood over the week",
        x="Weekday",y="Proportion of total days",
        fill="Mood")
+ggsave("days.png")
 
-#think about which variables can be included. i.e. whether some
-#empty cells or whether not enough yeses
+#to look at relationship between each predictor and outcome
 table(daylio$sophie,daylio$moodbin)
 table(daylio$friends,daylio$moodbin)
 table(daylio$family,daylio$moodbin)
@@ -73,16 +73,17 @@ f_upper<-function(data,mapping){
   ggplot(data=data,mapping=mapping)+
     geom_jitter()
 }
-#plot
+#plot to see if outside, adventure, camping and hiking might
+#be collinear
 ggpairs(daylio[, c("outside","adventure","camping","hiking")],
         lower=list(discrete=f_lower),upper=list(discrete=f_upper),
         diag=list(discrete=f_diag))
+ggsave("panel.png")
 #adventure very general term encompassing camping and hiking
 #cannot include camping in pos/neg model so see if hiking
 #is a subset of adventure
 ggplot(data=daylio,aes(x=adventure,y=hiking,colour=mood))+
-  scale_colour_brewer(palette="Greens")+
-  geom_jitter(aes(size=2))
+  scale_colour_brewer(palette="Greens")+geom_jitter(size=3)
 #hiking is mainly a subset of adventure so create hikeless adventure
 daylio$hikelessadventure<-ifelse(daylio$hiking=="no" & 
                                    daylio$adventure=="yes",
@@ -90,6 +91,11 @@ daylio$hikelessadventure<-ifelse(daylio$hiking=="no" &
 daylio$hikelessadventure<-factor(daylio$hikelessadventure,
                                  levels=c(0,1),
                                  labels=c("no","yes"))
+
+#see whether work and stats collinear, though i do not think so...
+ggplot(data=daylio,aes(x=work,y=stats,colour=mood))+
+  scale_colour_brewer(palette="Greens")+geom_jitter(size=3)
+#plenty of yes/no, no/yes combinations so fine.
 
 #logistic regression
 #first do not include those established cannot include above
@@ -112,8 +118,8 @@ weekdaym1<-glm(moodbin~weekday,family=binomial(link='logit'),
 summary(weekdaym1)
 #negative coefficients for weekdays and positive coefficients
 #for weekend so dichotomise for weekend or not
-daylio$weekend<-ifelse(daylio$weekday=="Saturday" | 
-                       daylio$weekday=="Sunday",1,0)
+daylio$weekend<-ifelse(daylio$weekday=="saturday" | 
+                       daylio$weekday=="sunday",1,0)
 daylio$weekend<-factor(daylio$weekend,levels=c(0,1),
                        labels=c("weekday","weekend"))
 #check in a model
@@ -136,8 +142,8 @@ model3<-glm(moodbin~sophie+friends+stats+
             family=binomial(link='logit'),data=daylio)
 summary(model3)
 ggcoef(model3,exponentiate=TRUE,exclude_intercept=TRUE,
-       errorbar_size=1,errorbar_color="forestgreen",
-       errorbar_height=0.5,color="forestgreen",
+       errorbar_size=1,errorbar_color=rgb(0,0.69,0.314),
+       errorbar_height=0.5,color=rgb(0,0.69,0.314),
        conf.level=0.9,
        mapping=aes(x=estimate,y=term,size=p.value))+
   scale_size_continuous(trans="reverse")+
@@ -146,6 +152,6 @@ ggcoef(model3,exponentiate=TRUE,exclude_intercept=TRUE,
                        "Sophie","Stats","Swimming"))+
   labs(title="Model to see the effect of activities on Happiness",
        subtitle="Great/Good vs. Mediocre/Bad",
-       x="Estimate",y="",size="P-value",
-       caption="(Error bars are based on 90% Confidence intervals)")
+       x="Estimate of the Odds Ratio",y="",size="P-Value",
+       caption="(Error bars are based on 90% Confidence Intervals)")
 ggsave("happiness_moodbinplot.png")

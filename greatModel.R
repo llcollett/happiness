@@ -1,4 +1,3 @@
-
 #packages
 library(tidyverse)
 library(dplyr)
@@ -11,8 +10,7 @@ setwd("C:/Users/LauraAcer/Documents/Data Science/Happiness/")
 #load data
 load("daylio.Rda")
 
-#think about which variables can be included. i.e. whether some
-#empty cells or whether not enough yeses
+#to look at relationship between each predictor and outcome
 table(daylio$sophie,daylio$moodgreat)
 table(daylio$friends,daylio$moodgreat)
 table(daylio$family,daylio$moodgreat)
@@ -81,31 +79,28 @@ summary(gweekendm1)
 ggcoef(gweekendm1,exponentiate=TRUE,exclude_intercept=TRUE,
        mapping=aes(x=estimate,y=term))
 #include in main model
-gmodel2<-glm(moodgreat~weekend+sophie+friends+family+stats+work+
-              outside+hikelessadventure+hiking+swimming+
-              climbing+running+cycling+lifting+softball+
-              lifeadmin+podcasting+reading+crafts+games+
-              music+television+driving,
+gmodel2<-glm(moodgreat~weekend+sophie+friends+family+stats+work+outside+
+               hikelessadventure+hiking+swimming+climbing+running+cycling+
+               lifting+softball+lifeadmin+podcasting+reading+crafts+games+
+               music+television+driving,
             family=binomial(link='logit'),data=daylio)
 summary(gmodel2)
 #remove those with highest p-value one by one
 #keep those with p-values<=0.1
 gmodel3<-glm(moodgreat~sophie+friends+work+
-              outside+hikelessadventure+hiking+swimming+
-              climbing+reading+driving,
+              outside+hikelessadventure+hiking+
+              reading+driving,
             family=binomial(link='logit'),data=daylio)
 summary(gmodel3)
 ggcoef(gmodel3,exponentiate=TRUE,exclude_intercept=TRUE,
-       errorbar_size=1,errorbar_color="chartreuse4",
-       errorbar_height=0.5,color="chartreuse4",
-       conf.level=0.9,
+       errorbar_size=1,errorbar_color=rgb(0,0.69,0.314),
+       errorbar_height=0.5,color=rgb(0,0.69,0.314),conf.level=0.9,
        mapping=aes(x=estimate,y=term,size=p.value))+
   scale_size_continuous(trans="reverse")+
+  theme(axis.text.y=element_text(size=8))+
   scale_y_discrete(labels=
-                     c("Climbing","Driving","Friends",
-                       "Hike-less Adventure","Hiking",
-                       "Outside","Reading","Sophie",
-                       "Swimming","Work"))+
+                     c("Driving","Friends","Hike-less Adventure","Hiking",
+                       "Outside","Reading","Sophie","Work"))+
   labs(title="Model to see the effect of activities on Happiness",
        subtitle="Great vs. Good/Mediocre/Bad",
        x="Estimate",y="",size="P-value",
