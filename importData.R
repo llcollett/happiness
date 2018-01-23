@@ -5,7 +5,7 @@ library(tidyverse)
 setwd("C:/Users/LauraAcer/Documents/Data Science/Happiness/")
 
 #initial dataset
-daylio<-read_csv("daylio_20180116.csv")
+daylio<-read_csv("daylio_2017.csv")
 daylio<-subset(daylio,daylio$year=="2017")
 daylio$date<-paste(daylio$date,daylio$year,sep=" ")
 daylio$date<-as.Date(daylio$date,"%d %B %Y")
