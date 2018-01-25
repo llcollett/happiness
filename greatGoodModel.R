@@ -5,7 +5,8 @@ library(GGally)
 library(broom)
 
 #working directory
-setwd("C:/Users/LauraAcer/Documents/Data Science/Happiness/")
+#setwd("C:/Users/LauraAcer/Documents/Data Science/Happiness/")
+setwd("O:/Documents/Personal/Projects/Data Science/Drive/Happiness")
 
 #load data
 load("daylio.Rda")
@@ -82,8 +83,11 @@ ggsave("panel.png")
 #adventure very general term encompassing camping and hiking
 #cannot include camping in pos/neg model so see if hiking
 #is a subset of adventure
-ggplot(data=daylio,aes(x=adventure,y=hiking,colour=mood))+
-  scale_colour_brewer(palette="Greens")+geom_jitter(size=3)
+ggplot(data=daylio,aes(x=adventure,y=hiking))+
+  geom_bin2d()+
+  stat_bin2d(geom="text",aes(label=(..count..),size=2,fontface="bold"))+
+  scale_fill_gradient(low="white",high="steelblue")
+
 #hiking is mainly a subset of adventure so create hikeless adventure
 daylio$hikelessadventure<-ifelse(daylio$hiking=="no" & 
                                    daylio$adventure=="yes",
@@ -93,8 +97,10 @@ daylio$hikelessadventure<-factor(daylio$hikelessadventure,
                                  labels=c("no","yes"))
 
 #see whether work and stats collinear, though i do not think so...
-ggplot(data=daylio,aes(x=work,y=stats,colour=mood))+
-  scale_colour_brewer(palette="Greens")+geom_jitter(size=3)
+ggplot(data=daylio,aes(x=work,y=stats))+
+  geom_bin2d()+
+  stat_bin2d(geom="text",aes(label=(..count..),size=2,fontface="bold"))+
+  scale_fill_gradient(low="white",high="steelblue")
 #plenty of yes/no, no/yes combinations so fine.
 
 #logistic regression
