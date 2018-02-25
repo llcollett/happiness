@@ -1,6 +1,6 @@
 # Happiness model via Daylio
 
-R code to request books and book ratings from the Goodreads API, compare recommendation system algorithms, and recommend books based on a previously compiled list of 'to read' and 'to acquire' books.
+R code to examine the relationship between daily activities and overall rating of the day. The five level outcome variable is split into Great vs. not Great, and Great/Good vs. Mediocre/Bad/Awful, in order to see the effect on variables on having a good or great day and having a great day, to see if there are certain activities that contribute to the effect on mood at varying levels of goodness. Multivariable models are fitted in order to determine whether there are is an effect of activities on mood, whilst adjusting for the other activities.
 
 ### Set-up
 
